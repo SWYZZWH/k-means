@@ -1,5 +1,5 @@
-/.vscode/*
-/__pycache__/*
+.vscode/*
+__pycache__/*
 data/guass_1_20.data
 data/guass_1_50.data
 data/guass_1_100.data
@@ -14,3 +14,6 @@ __pycache__/kmeans.cpython-39.pyc
 __pycache__/utility.cpython-39.pyc
 test/__pycache__/__init__.cpython-39.pyc
 test/__pycache__/utility.cpython-39.pyc
+kmeans.pyc
+__pycache__/kmeans.cpython-39.pyc
+data/result.data
