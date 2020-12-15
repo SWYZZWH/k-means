@@ -1,0 +1,16 @@
+/.vscode/*
+/__pycache__/*
+data/guass_1_20.data
+data/guass_1_50.data
+data/guass_1_100.data
+data/guass_10_20.data
+data/guass_10_50.data
+data/guass_10_100.data
+data/guass_100_20.data
+data/guass_100_50.data
+data/guass_100_100.data
+.DS_Store
+__pycache__/kmeans.cpython-39.pyc
+__pycache__/utility.cpython-39.pyc
+test/__pycache__/__init__.cpython-39.pyc
+test/__pycache__/utility.cpython-39.pyc

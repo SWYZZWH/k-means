@@ -9,7 +9,6 @@ class kmeans_basic:
         self.n, self.dim = points.shape
         self.k = k
         self.points = points
-        self.time = 0
         
         if centers is None:
             # 随机初始化
@@ -21,20 +20,20 @@ class kmeans_basic:
         self.weights = weights
         self.iter = iter
 
-    def get_cost(self):
+    def cost(self):
         distances = dis(self.points, self.centers)
         return cost(distances)
     
-    def get_time(self):
+    def time(self):
         return self.time
 
     def train(self):
-        start = time.time_ns() 
+        self.time = start = time.time_ns() 
         for i in range(self.iter):
             distances = dis(self.points, self.centers)
             cst = cost(distances)
-            self.time = time.time_ns() - start
-            print("iter {}, cost: {}, time: {}ns".format(i+1, cst, self.time))
+            self.time = time.time_ns()
+            print("iter {}, cost: {}, time: {}ns", i+1, cst, self.time - start)
             if self.weighted:
                 distances = distances * self.weights[:, np.newaxis] # 每个点加权
             index_array = np.argmin(distances, axis=1)
@@ -76,10 +75,10 @@ class kmeans_plusplus:
         distances = dis(self.points, self.centers)
         self.distribution = np.min(distances, axis=1) / np.sum(np.min(distances, axis=1)) 
     
-    def get_time(self):
+    def time(self):
         return self.time
     
-    def get_cost(self):
+    def cost(self):
         return self.cost
 
     def train(self):        
@@ -96,10 +95,10 @@ class kmeans_plusplus:
         self.time = time.time_ns() - start
     
         print("cost after init:{}, init time:{}".format(self.cost, self.time))
-        kmeans = kmeans_basic(self.points, self.k, self.iter, centers=self.centers)
+        kmeans = kmeans_basic(self.points, self.k, self.iterm, centers=self.centers)
         kmeans.train()
-        self.time = kmeans.get_time()
-        self.cost = kmeans.get_cost()
+        self.time = kmeans.time()
+        self.cost = kmeans.cost()
             
 
 class kmeans_parallel:
@@ -119,13 +118,12 @@ class kmeans_parallel:
             # 初始分布
             distances = dis(self.points, self.centers)
             self.distribution = np.min(distances, axis=1) / np.sum(np.min(distances, axis=1)) 
-            self.time = 0
 
-        def get_cost(self):
+        def cost(self):
             distances = dis(self.points, self.centers)
             return cost(distances)
             
-        def get_time(self):
+        def time(self):
             return self.time
 
         def get_weights(self):
@@ -138,16 +136,13 @@ class kmeans_parallel:
             """
             centers num : self.iter * self.k 
             """
-            start = time.time_ns()
             for i in range(self.iter - 1):
                 next_centers = self.points[np.random.choice(len(self.points), self.k, p=self.distribution), :]
                 self.centers = np.vstack((self.centers, next_centers))
                 # 更新分布，已经被选中的点是不会被再次选中的
                 distances = dis(self.points, self.centers)
                 self.distribution = np.min(distances, axis=1) / np.sum(np.min(distances, axis=1)) 
-            self.time = time.time_ns() - start
-            print("cost after init:{}, init time:{}".format(self.get_cost(), self.time))
-            
+
             weights = self.get_weights()
             if not self.weighted:
                 self.centers = self.centers[np.random.choice(len(self.centers), self.k, p=weights), :]
@@ -155,7 +150,7 @@ class kmeans_parallel:
                 # iter 可以取很大不用担心性能问题，因为可以提前收敛
                 kmeans_weighted = kmeans_basic( points=self.centers, k=self.k, iter=self.iter * 1000, weighted = True, weights=weights)
                 kmeans_weighted.train()
-                self.time = kmeans_weighted.get_time()
+                self.time = kmeans_weighted.time()
                 self.centers =  kmeans_weighted.centers
 
             
